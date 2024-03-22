@@ -1,1 +1,12 @@
+.vscode/
+.idea/
+
 /**/*.class
+/**/*.jar
+
+/hw0/output
+/hw0/scala/output
+/hw0/scala/target
+/hw0/scala/project
+
+/hw2/output*/

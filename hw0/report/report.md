@@ -38,14 +38,14 @@ export HADOOP_HOME=~/.hadoop
 export PATH=~/.hadoop/bin:$PATH
 ```
 
-finally, to verify the installation:
+finally, to verify the installation:\
 ![alt text](image-1.png)
 
 # Download and install Spark
-download the spark 3.2.1:
+download the spark 3.2.1:\
 ![alt text](image-3.png)
 
-extract the spark to `~/.spark`:
+extract the spark to `~/.spark`:\
 ![alt text](image-4.png)
 
 set the `SPARK_HOME` and add it to the `PATH`:
@@ -54,15 +54,17 @@ export SPARK_HOME=~/.spark
 export PATH=~/.spark/bin:$PATH
 ```
 
-finally, to verify the installation:
+finally, to verify the installation:\
 ![alt text](image-5.png)
+
+# Run the WordCount example in Apache Hadoop
 
 to make a jar file using the codes, we need to compile the codes using the following command:
 ```bash
 javac -classpath $(hadoop classpath) *.java
 ```
 
-to verify the compliation:
+to verify the compliation:\
 ![alt text](image-6.png)
 
 finally, to make a jar file:
@@ -80,7 +82,7 @@ Now we can use this command to run the `HadoopWordCount`:
 hadoop jar HadoopWordCount.jar HadoopWordCount ~/data/wikipedia/enwiki-articles/AA/ output
 ```
 
-to verify the output:
+to verify the output:\
 ![alt text](image-7.png)
 
 for the `HadoopWordPairs`:
@@ -89,7 +91,7 @@ rm -rf output
 hadoop jar HadoopWordCount.jar HadoopWordPairs ~/data/wikipedia/enwiki-articles/AA/ output
 ```
 
-to verify the output:
+to verify the output:\
 ![alt text](image-8.png)
 
 
@@ -99,5 +101,40 @@ rm -rf output
 hadoop jar HadoopWordCount.jar HadoopWordStripes ~/data/wikipedia/enwiki-articles/AA/ output
 ```
 
-to verify the output:
+to verify the output:\
 ![alt text](image-9.png)
+
+
+# Run the WordCount Example in Apache Spark
+
+to run the `SparkWordCount` we need to install sbt using [here](https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Linux.html) 
+and then we need a `build.sbt` file as follows:
+```sbt
+name := "Simple Project"
+
+version := "1.0"
+
+scalaVersion := "2.12.18"
+
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.5.0"
+```
+
+we need to make a directory structure as follows:
+```
+$ find src build.*
+src
+src/main
+src/main/scala
+src/main/scala/SparkWordCount.scala
+build.sbt
+```
+
+and then we can use the following command to run the `SparkWordCount`:
+```bash
+sbt package
+spark-submit --class SparkWordCount target/scala-2.12/simple-project_2.12-1.0.jar ~/data/wikipedia/enwiki-articles/AA/ output
+```
+
+to verify the output:\
+![alt text](image-11.png)
+
