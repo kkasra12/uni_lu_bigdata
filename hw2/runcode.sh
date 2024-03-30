@@ -1,4 +1,4 @@
-class_name="HadoopWordCount_p1b3"
+class_name="HadoopWordPairs_p1b4"
 javac -classpath $(hadoop classpath) *.java
 read -n 1 -s -r -p "Press any key to continue, or press Ctrl+C to exit..."
 jar cf hw2.jar *.class

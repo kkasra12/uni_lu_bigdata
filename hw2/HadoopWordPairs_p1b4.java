@@ -19,20 +19,22 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class HadoopWordCount_p1b3 extends Configured implements Tool {
+public class HadoopWordPairs_p1b4 extends Configured implements Tool {
 
 	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
-
 		private final static IntWritable one = new IntWritable(1);
-		private Text word = new Text();
+		private Text pair = new Text();
+		private Text lastWord = new Text();
 
 		@Override
-		public void map(LongWritable key, Text value, Context context)
-				throws IOException, InterruptedException {
+		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
 			for (String w : tokenizer(value.toString(), "[a-z]{1,25}")) {
-				word.set(w);
-				context.write(word, one);
+				if (lastWord.getLength() > 0) {
+					pair.set(lastWord + ":" + w);
+					context.write(pair, one);
+				}
+				lastWord.set(w);
 			}
 		}
 
@@ -45,13 +47,13 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 					words.add(w);
 			return words;
 		}
+
 	}
 
 	public static class Map_sorter extends Mapper<LongWritable, Text, IntWritable, Text> {
 
 		@Override
-		public void map(LongWritable key, Text value, Context context)
-				throws IOException, InterruptedException {
+		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
 			String[] wordCount = value.toString().split("\t");
 			context.write(new IntWritable(Integer.parseInt(wordCount[1])), new Text(wordCount[0]));
@@ -63,8 +65,8 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		@Override
 		public void reduce(Text key, Iterable<IntWritable> values, Context context)
 				throws IOException, InterruptedException {
-
 			int sum = 0;
+
 			for (IntWritable value : values)
 				sum += value.get();
 
@@ -85,7 +87,7 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 
 	@Override
 	public int run(String[] args) throws Exception {
-		String tmp_path = "./tmp/";
+		String tmp_path = "./output_tmp/";
 
 		// Delete tmp_path if it exists
 		File tmpDir = new File(tmp_path);
@@ -100,8 +102,8 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 			tmpDir.delete();
 		}
 
-		Job job = Job.getInstance(new Configuration(), "HadoopWordCount");
-		job.setJarByClass(HadoopWordCount_p1b3.class);
+		Job job = Job.getInstance(new Configuration(), "HadoopWordPairs_p1b4");
+		job.setJarByClass(HadoopWordPairs_p1b4.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
@@ -112,13 +114,13 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 
-		FileInputFormat.setInputPaths(job, new Path(args[0]));
+		FileInputFormat.setInputPaths(job, args[0]);
 		FileOutputFormat.setOutputPath(job, new Path(tmp_path));
 
 		job.waitForCompletion(true);
 
-		Job job_sorter = Job.getInstance(new Configuration(), "HadoopWordCount_sorter");
-		job_sorter.setJarByClass(HadoopWordCount_p1b3.class);
+		Job job_sorter = Job.getInstance(new Configuration(), "HadoopWordPairs_p1b4_sorter");
+		job_sorter.setJarByClass(HadoopWordPairs_p1b4.class);
 
 		job_sorter.setOutputKeyClass(IntWritable.class);
 		job_sorter.setOutputValueClass(Text.class);
@@ -152,7 +154,7 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 	}
 
 	public static void main(String[] args) throws Exception {
-		int ret = ToolRunner.run(new Configuration(), new HadoopWordCount_p1b3(), args);
+		int ret = ToolRunner.run(new Configuration(), new HadoopWordPairs_p1b4(), args);
 		System.exit(ret);
 	}
 }
