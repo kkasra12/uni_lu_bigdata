@@ -29,7 +29,7 @@ public class HadoopWordCount_p1b1 extends Configured implements Tool {
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			for (String w : tokenizer(value.toString(), "[a-z]{5,25}")) {
+			for (String w : tokenizer(value.toString(), "[a-z]{1,25}")) {
 				word.set(w);
 				context.write(word, one);
 			}
@@ -55,7 +55,7 @@ public class HadoopWordCount_p1b1 extends Configured implements Tool {
 			for (IntWritable value : values)
 				sum += value.get();
 
-			if (sum >= 400)
+			if (Math.abs(sum - 1000) < 10)
 				context.write(key, new IntWritable(sum));
 			// else
 			// context.write(key, new ntWriItable(0));
@@ -72,7 +72,6 @@ public class HadoopWordCount_p1b1 extends Configured implements Tool {
 		job.setOutputValueClass(IntWritable.class);
 
 		job.setMapperClass(Map.class);
-		job.setCombinerClass(Reduce.class);
 		job.setReducerClass(Reduce.class);
 
 		job.setInputFormatClass(TextInputFormat.class);

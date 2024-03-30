@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -29,7 +30,7 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			for (String w : tokenizer(value.toString(), "[a-z]{5,25}")) {
+			for (String w : tokenizer(value.toString(), "[a-z]{1,25}")) {
 				word.set(w);
 				context.write(word, one);
 			}
@@ -46,9 +47,19 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		}
 	}
 
+	public static class Map_sorter extends Mapper<LongWritable, Text, IntWritable, Text> {
+
+		@Override
+		public void map(LongWritable key, Text value, Context context)
+				throws IOException, InterruptedException {
+
+			String[] wordCount = value.toString().split("\t");
+			context.write(new IntWritable(Integer.parseInt(wordCount[1])), new Text(wordCount[0]));
+		}
+	}
+
 	public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable> {
-		
-		String[] 
+
 		@Override
 		public void reduce(Text key, Iterable<IntWritable> values, Context context)
 				throws IOException, InterruptedException {
@@ -59,14 +70,37 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 
 			if (sum >= 400)
 				context.write(key, new IntWritable(sum));
-			// else
-			// context.write(key, new ntWriItable(0));
 		}
+	}
 
+	public static class Reduce_sorter extends Reducer<IntWritable, Text, Text, IntWritable> {
+
+		@Override
+		public void reduce(IntWritable key, Iterable<Text> values, Context context)
+				throws IOException, InterruptedException {
+
+			for (Text value : values)
+				context.write(value, key);
+		}
 	}
 
 	@Override
 	public int run(String[] args) throws Exception {
+		String tmp_path = "./tmp/";
+
+		// Delete tmp_path if it exists
+		File tmpDir = new File(tmp_path);
+		if (tmpDir.exists() && tmpDir.isDirectory()) {
+
+			File[] files = tmpDir.listFiles();
+			if (files != null) {
+				for (File file : files) {
+					file.delete();
+				}
+			}
+			tmpDir.delete();
+		}
+
 		Job job = Job.getInstance(new Configuration(), "HadoopWordCount");
 		job.setJarByClass(HadoopWordCount_p1b3.class);
 
@@ -74,16 +108,47 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		job.setOutputValueClass(IntWritable.class);
 
 		job.setMapperClass(Map.class);
-		job.setCombinerClass(Reduce.class);
 		job.setReducerClass(Reduce.class);
 
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		FileOutputFormat.setOutputPath(job, new Path(tmp_path));
 
 		job.waitForCompletion(true);
+
+		Job job_sorter = Job.getInstance(new Configuration(), "HadoopWordCount_sorter");
+		job_sorter.setJarByClass(HadoopWordCount_p1b3.class);
+
+		job_sorter.setOutputKeyClass(IntWritable.class);
+		job_sorter.setOutputValueClass(Text.class);
+
+		job_sorter.setMapperClass(Map_sorter.class);
+		job_sorter.setReducerClass(Reduce_sorter.class);
+
+		job_sorter.setInputFormatClass(TextInputFormat.class);
+		job_sorter.setOutputFormatClass(TextOutputFormat.class);
+
+		FileInputFormat.setInputPaths(job_sorter, new Path(tmp_path));
+		FileOutputFormat.setOutputPath(job_sorter, new Path(args[1]));
+
+		job_sorter.waitForCompletion(true);
+
+		int n = 100;
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.contains("linux")) {
+			String tempFile = args[1] + "/tempfile";
+			ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c",
+					"tail -n " + n + " " + args[1] + "/part-r-00000" + " > " + tempFile);
+			processBuilder.start().waitFor();
+			ProcessBuilder renameBuilder = new ProcessBuilder("mv", tempFile, args[1] + "/part-r-00000");
+			renameBuilder.start().waitFor();
+			System.out.println("The " + n + " most frequent words are saved in " + args[1] + "/part-r-00000");
+		} else {
+			System.err.println("This is a non-Linux machine, please trim the " + n + " last lines of the " + args[1]
+					+ "/part-r-00000 file manually");
+		}
 		return 0;
 	}
 

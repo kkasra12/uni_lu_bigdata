@@ -28,7 +28,7 @@ public class HadoopWordPairs_p1b2 extends Configured implements Tool {
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
-			for (String w : tokenizer(value.toString(), "[a-z]{5,25}")) {
+			for (String w : tokenizer(value.toString(), "[a-z]{1,25}")) {
 				if (lastWord.getLength() > 0) {
 					pair.set(lastWord + ":" + w);
 					context.write(pair, one);
@@ -58,8 +58,7 @@ public class HadoopWordPairs_p1b2 extends Configured implements Tool {
 
 			for (IntWritable value : values)
 				sum += value.get();
-
-			if (sum > 100)
+			if (Math.abs(sum - 1000) < 10)
 				context.write(key, new IntWritable(sum));
 		}
 	}
@@ -71,8 +70,8 @@ public class HadoopWordPairs_p1b2 extends Configured implements Tool {
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
+
 		job.setMapperClass(Map.class);
-		job.setCombinerClass(Reduce.class);
 		job.setReducerClass(Reduce.class);
 
 		job.setInputFormatClass(TextInputFormat.class);
