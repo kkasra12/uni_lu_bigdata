@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -87,19 +88,19 @@ public class HadoopWordPairs_p1b4 extends Configured implements Tool {
 
 	@Override
 	public int run(String[] args) throws Exception {
+		System.out.println(args);
+		for (String arg : args) {
+			System.out.println(arg);
+		}
+		// System.exit(1);
+
 		String tmp_path = "./output_tmp/";
 
 		// Delete tmp_path if it exists
 		File tmpDir = new File(tmp_path);
 		if (tmpDir.exists() && tmpDir.isDirectory()) {
-
-			File[] files = tmpDir.listFiles();
-			if (files != null) {
-				for (File file : files) {
-					file.delete();
-				}
-			}
-			tmpDir.delete();
+			FileUtil.fullyDelete(tmpDir);
+			System.out.println("Deleted the existing tmp_path: " + tmp_path);
 		}
 
 		Job job = Job.getInstance(new Configuration(), "HadoopWordPairs_p1b4");
@@ -114,7 +115,10 @@ public class HadoopWordPairs_p1b4 extends Configured implements Tool {
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 
-		FileInputFormat.setInputPaths(job, args[0]);
+		for (int i = 0; i < args.length - 1; i++) {
+			FileInputFormat.addInputPath(job, new Path(args[i]));
+		}
+		// FileInputFormat.setInputPaths(job, args[0]);
 		FileOutputFormat.setOutputPath(job, new Path(tmp_path));
 
 		job.waitForCompletion(true);
@@ -132,7 +136,7 @@ public class HadoopWordPairs_p1b4 extends Configured implements Tool {
 		job_sorter.setOutputFormatClass(TextOutputFormat.class);
 
 		FileInputFormat.setInputPaths(job_sorter, new Path(tmp_path));
-		FileOutputFormat.setOutputPath(job_sorter, new Path(args[1]));
+		FileOutputFormat.setOutputPath(job_sorter, new Path(args[args.length - 1]));
 
 		job_sorter.waitForCompletion(true);
 
