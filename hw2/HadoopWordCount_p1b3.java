@@ -112,7 +112,9 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 
-		FileInputFormat.setInputPaths(job, new Path(args[0]));
+		for (int i = 0; i < args.length - 1; i++)
+			FileInputFormat.addInputPath(job, new Path(args[i]));
+		// The last argument is the output path
 		FileOutputFormat.setOutputPath(job, new Path(tmp_path));
 
 		job.waitForCompletion(true);
@@ -130,7 +132,7 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		job_sorter.setOutputFormatClass(TextOutputFormat.class);
 
 		FileInputFormat.setInputPaths(job_sorter, new Path(tmp_path));
-		FileOutputFormat.setOutputPath(job_sorter, new Path(args[1]));
+		FileOutputFormat.setOutputPath(job_sorter, new Path(args[args.length - 1]));
 
 		job_sorter.waitForCompletion(true);
 

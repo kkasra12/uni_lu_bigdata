@@ -77,8 +77,10 @@ public class HadoopWordPairs_p1b2 extends Configured implements Tool {
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 
-		FileInputFormat.setInputPaths(job, args[0]);
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		for (int i = 0; i < args.length - 1; i++)
+			FileInputFormat.addInputPath(job, new Path(args[i]));
+		// The last argument is the output path
+		FileOutputFormat.setOutputPath(job, new Path(args[args.length - 1]));
 
 		job.waitForCompletion(true);
 		return 0;
