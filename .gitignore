@@ -11,3 +11,6 @@
 
 /hw2/output*/
 /hw2/output*.txt
+hw2/scala/out*
+hw2/scala/target
+hw2/scala/project

@@ -10,11 +10,14 @@ object SparkWordCount {
 
     val sparkConf = new SparkConf().setAppName("SparkWordCount")
     val ctx = new SparkContext(sparkConf)
-    val textFile = ctx.textFile(args(0))
-    val counts = textFile.flatMap(line => line.split(" "))
-                 .map(word => (word, 1))
-                 .reduceByKey(_ + _)
-    counts.saveAsTextFile(args(1)) 
+    
+    for (inputDir <- args.dropRight(1)) {
+      val textFile = ctx.textFile(inputDir)
+      val counts = textFile.flatMap(line => line.split(" "))
+             .map(word => (word, 1))
+             .reduceByKey(_ + _)
+      counts.saveAsTextFile(args.last)
+    }
     ctx.stop()
   }
 }
