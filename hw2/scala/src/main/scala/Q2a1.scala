@@ -19,7 +19,7 @@ object Q2a1 {
     val all_maps_results = ArrayBuffer.empty[RDD[(String, Int)]]
     for (inputDir <- args.dropRight(1)) {
       val this_map = ctx.wholeTextFiles(inputDir).flatMap{case (path, text) =>
-        word_pattern.findAllIn(text.toLowerCaseQ)}.map(word => (word, 1)).reduceByKey(_ + _)
+        word_pattern.findAllIn(text.toLowerCase)}.map(word => (word, 1)).reduceByKey(_ + _)
       // this resduceByKey can be considered as a combiner
       // this_map.take(10).foreach(println)
       all_maps_results += this_map
