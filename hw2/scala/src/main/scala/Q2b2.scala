@@ -35,7 +35,6 @@ object Q2b2 {
     }
     val counts = all_maps_results.reduce(_ union _).reduceByKey(_ + _).filter{case (word, count) => (count - 1000).abs < 10}
     counts.saveAsTextFile(args.last)
-    println("Word count done!")
     ctx.stop()
   }
 }

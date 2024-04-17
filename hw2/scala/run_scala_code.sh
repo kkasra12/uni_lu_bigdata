@@ -1,4 +1,4 @@
-class_name="Q2b2"
+class_name="Q2b4"
 sbt package
 read -n 1 -s -r -p "Press any key to continue, or press Ctrl+C to exit..."
 out_dir="output_$class_name"
