@@ -25,30 +25,21 @@ public class HadoopWordPairs_p1b4 extends Configured implements Tool {
 	public static class Map extends Mapper<LongWritable, Text, Text, IntWritable> {
 		private final static IntWritable one = new IntWritable(1);
 		private Text pair = new Text();
-		private Text lastWord = new Text();
+		// Pattern word_validator = Pattern.compile("[a-z]+");
+		// Pattern numb_validator = Pattern.compile("[0-9]+(.[0-9]+)?");
+		// Pattern numb_validator = Pattern.compile("\\d+");
+		String word_validator = "[a-z]+", numb_validator = "\\d+";
 
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
-			for (String w : tokenizer(value.toString(), "[a-z]{1,25}")) {
-				if (lastWord.getLength() > 0) {
-					pair.set(lastWord + ":" + w);
+			String[] words = value.toString().toLowerCase().split(" ");
+			for (int i = 0; i < words.length - 2; i++)
+				if (words[i].matches(numb_validator) && words[i + 1].matches(word_validator)) {
+					pair.set(words[i] + ":" + words[i + 1]);
 					context.write(pair, one);
 				}
-				lastWord.set(w);
-			}
 		}
-
-		public ArrayList<String> tokenizer(String line, String regex) {
-			String[] raw_words = line.replaceAll("[!?.,]", " ").toLowerCase().split("\\s+");
-			Pattern word_validator = Pattern.compile(regex);
-			ArrayList<String> words = new ArrayList<String>();
-			for (String w : raw_words)
-				if (word_validator.matcher(w).matches())
-					words.add(w);
-			return words;
-		}
-
 	}
 
 	public static class Map_sorter extends Mapper<LongWritable, Text, IntWritable, Text> {
@@ -115,7 +106,7 @@ public class HadoopWordPairs_p1b4 extends Configured implements Tool {
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 
-		for (int i = 0; i < args.length - 1; i++) 
+		for (int i = 0; i < args.length - 1; i++)
 			FileInputFormat.addInputPath(job, new Path(args[i]));
 		// The last argument is the output path
 		// FileInputFormat.setInputPaths(job, args[0]);

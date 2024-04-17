@@ -37,7 +37,6 @@ def main(class_name, input_folder, output_folder_prefix="output"):
 
     # compiling the java code finished
 
-    output = [["index", "Number of files", "Execution time"]]
     input_folders = []
     report_name = f"report_{class_name}.csv"
 
@@ -48,6 +47,8 @@ def main(class_name, input_folder, output_folder_prefix="output"):
                 [int(line.strip().split(",")[0]) for line in f.readlines()]
             )
     else:
+        with open(report_name, "w") as f:
+            f.write("index,folders,Execution time\n")
         last_index = -1
 
     for index, folder_name in enumerate(sorted(os.listdir(input_folder))):
@@ -68,7 +69,7 @@ def main(class_name, input_folder, output_folder_prefix="output"):
         out = os.system(command)
         assert out == 0, f"Error in running the command: {command}, out: {out}"
         # output.append([index, ",".join(input_folders), time.time() - start])
-        line = f"{index},{','.join(input_folders)},{time.time() - start}\n"
+        line = f"{index},{'-'.join(input_folders)},{time.time() - start}\n"
         with open(report_name, "a") as f:
             f.write(line)
         print(line)

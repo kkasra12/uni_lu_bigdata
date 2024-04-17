@@ -29,19 +29,16 @@ public class HadoopWordCount_p1b1 extends Configured implements Tool {
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			String[] words = value.toString().toLowerCase().split("[^a-z]+");
-			for (String w : words) {
-				// if (w.length() > 5 && w.length() < 25) {
+			for (String w : tokenizer(value.toString(), "[a-z]+")) {
 				word.set(w);
 				context.write(word, one);
-				// }
 			}
 		}
 
 		public ArrayList<String> tokenizer(String line, String regex) {
 			// String[] raw_words = line.replaceAll("[!?.,]", "
 			// ").toLowerCase().split("\\s+");
-			String[] raw_words = line.toLowerCase().split("\\s+");
+			String[] raw_words = line.toLowerCase().split("\\b");
 			Pattern word_validator = Pattern.compile(regex);
 			ArrayList<String> words = new ArrayList<String>();
 			for (String w : raw_words)
@@ -59,9 +56,6 @@ public class HadoopWordCount_p1b1 extends Configured implements Tool {
 			int sum = 0;
 			for (IntWritable value : values)
 				sum += value.get();
-
-			if (key.toString().equals("philosophy"))
-				context.write(key, new IntWritable(sum));
 
 			if (Math.abs(sum - 1000) < 10)
 				context.write(key, new IntWritable(sum));

@@ -30,14 +30,14 @@ public class HadoopWordCount_p1b3 extends Configured implements Tool {
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 
-			for (String w : tokenizer(value.toString(), "[a-z]{1,25}")) {
+			for (String w : tokenizer(value.toString(), "[a-z]+")) {
 				word.set(w);
 				context.write(word, one);
 			}
 		}
 
 		public ArrayList<String> tokenizer(String line, String regex) {
-			String[] raw_words = line.replaceAll("[!?.,]", " ").toLowerCase().split("\\s+");
+			String[] raw_words = line.replaceAll("[!?.,]", " ").toLowerCase().split("\\b");
 			Pattern word_validator = Pattern.compile(regex);
 			ArrayList<String> words = new ArrayList<String>();
 			for (String w : raw_words)

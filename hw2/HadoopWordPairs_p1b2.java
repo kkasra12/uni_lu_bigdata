@@ -28,7 +28,7 @@ public class HadoopWordPairs_p1b2 extends Configured implements Tool {
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
-			for (String w : tokenizer(value.toString(), "[a-z]{1,25}")) {
+			for (String w : tokenizer(value.toString(), "[a-z]+")) {
 				if (lastWord.getLength() > 0) {
 					pair.set(lastWord + ":" + w);
 					context.write(pair, one);
@@ -38,7 +38,7 @@ public class HadoopWordPairs_p1b2 extends Configured implements Tool {
 		}
 
 		public ArrayList<String> tokenizer(String line, String regex) {
-			String[] raw_words = line.replaceAll("[!?.,]", " ").toLowerCase().split("\\s+");
+			String[] raw_words = line.replaceAll("[!?.,]", " ").toLowerCase().split("\\b");
 			Pattern word_validator = Pattern.compile(regex);
 			ArrayList<String> words = new ArrayList<String>();
 			for (String w : raw_words)
