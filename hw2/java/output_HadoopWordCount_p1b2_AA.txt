@@ -1,0 +1,8 @@
+Exception in thread "main" java.lang.ClassNotFoundException: HadoopWordCount_p1b2
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:387)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:418)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:351)
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:219)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:141)
