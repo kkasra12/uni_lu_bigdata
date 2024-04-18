@@ -33,7 +33,7 @@ public class HadoopWordPairs_p1b4 extends Configured implements Tool {
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
-			String[] words = value.toString().toLowerCase().split(" ");
+			String[] words = value.toString().toLowerCase().split("[\\s.]+");
 			for (int i = 0; i < words.length - 2; i++)
 				if (words[i].matches(numb_validator) && words[i + 1].matches(word_validator)) {
 					pair.set(words[i] + ":" + words[i + 1]);

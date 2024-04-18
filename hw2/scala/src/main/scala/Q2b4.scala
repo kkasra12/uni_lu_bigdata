@@ -14,20 +14,20 @@ object Q2b4 {
       System.err.println("Correct arguments: <input-directory(s)> <output-directory>")
       System.exit(1)
     }
-    val word_pattern = new Regex("""[a-z]+""")
     val sparkConf = new SparkConf().setAppName("SparkWordCount").setMaster("local[*]")
     val ctx = new SparkContext(sparkConf)
     
     val all_maps_results = ArrayBuffer.empty[RDD[((String, String), Int)]]
     for (inputDir <- args.dropRight(1)) {
       val this_map = ctx.wholeTextFiles(inputDir)
-        .flatMap{case (path, text) => word_pattern.findAllIn(text.toLowerCase)}
-        .sliding(2)
-        .map{case Array(word1, word2) => ((word1, word2), 1)}
-        .reduceByKey(_ + _)
+        .flatMap{case (path, text) => text.split("""[\s.]+""")}
+         .sliding(2)
+         .filter{case Array(word1, word2) => word1.matches("""\d+""") && word2.matches("""[a-z]+""")}
+         .map{case Array(word1, word2) => ((word1, word2), 1)}
+         .reduceByKey(_ + _)
       
-      // this_map.take(10).foreach(println)
-      all_maps_results += this_map
+      this_map.take(70).foreach(println)
+       all_maps_results += this_map
     }
     val counts = all_maps_results.reduce(_ union _).reduceByKey(_ + _).take(100)
     ctx.parallelize(counts).saveAsTextFile(args.last)

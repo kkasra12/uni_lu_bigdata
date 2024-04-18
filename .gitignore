@@ -2,16 +2,11 @@
 .idea/
 
 /**/*.class
-/**/*.jar
 
 /hw0/output
 /hw0/scala/output
 /hw0/scala/target
 /hw0/scala/project
 
-/hw2/output*/
-/hw2/output*.txt
-hw2/scala/out*
-hw2/scala/target
-hw2/scala/project
-hw2/pyspark/output*/
+output*/
+output*.txt

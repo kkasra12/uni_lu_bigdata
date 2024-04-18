@@ -43,6 +43,7 @@ def main(class_name, input_folder, output_folder_prefix="output"):
     # find the last index that is processed
     if os.path.exists(report_name):
         with open(report_name, "r") as f:
+            f.readline()
             last_index = max(
                 [int(line.strip().split(",")[0]) for line in f.readlines()]
             )
@@ -79,6 +80,6 @@ def main(class_name, input_folder, output_folder_prefix="output"):
 if __name__ == "__main__":
     """
     for instance use:
-    python3 p1c.py HadoopWordCount_p1b1 ~/data/wikipedia/enwiki-articles/
+    python3 p1c.py HadoopWordCount_p1b3 ~/data/wikipedia/enwiki-articles/
     """
     fire.Fire(main)

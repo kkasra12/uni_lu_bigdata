@@ -1,0 +1,6 @@
+[0m[[0m[31merror[0m] [0m[0m/mnt/c/Users/kkasr/projects/uni_lu_big_data/hw2/scala/src/main/scala/Q2b4.scala:30:27: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m found   : org.apache.spark.rdd.RDD[String][0m
+[0m[[0m[31merror[0m] [0m[0m required: org.apache.spark.rdd.RDD[((String, String), Int)][0m
+[0m[[0m[31merror[0m] [0m[0m      all_maps_results += this_map[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m

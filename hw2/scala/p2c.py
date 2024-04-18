@@ -13,8 +13,9 @@ def main(class_name, input_folder, output_folder_prefix="output"):
     report_name = f"report_{class_name}.csv"
     if os.path.exists(report_name):
         with open(report_name, "r") as f:
+            f.readline()
             last_index = max(
-                [int(line.strip().split(",")[0]) for line in f.readlines()]
+                [int(line.strip().split(",")[0]) for line in f.readlines()] or [-1]
             )
     else:
         with open(report_name, "w") as f:
@@ -35,7 +36,7 @@ def main(class_name, input_folder, output_folder_prefix="output"):
             f"spark-submit --class {class_name} "
             "target/scala-2.12/hw2_2.12-1.0.jar "
             f"{input_folder}/{'{'}{','.join(input_folders)}{'}'} "
-            f"{output_folder_prefix}_{folder_name} "
+            f"{output_folder_prefix}_{class_name}_{folder_name} "
             f"2> output_{class_name}_{folder_name}.txt"
         )
         print(f"Running the command: {command}")
