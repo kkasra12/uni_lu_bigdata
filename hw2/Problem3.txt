@@ -1,0 +1,7 @@
+# (C)
+We can see in the outputs of the code the mean before changing the null values is __ and after setting the null values to 23 the mean is __.
+So, only the rows with __<age<__ are considered in the new output which are __ rows.
+
+# (D)
+The survival age average is 28.34 and the average age of the died passengers is 30.63, which has no big difference. 
+And it's somehow logical because we know they board the rescue boats with younger people first!
