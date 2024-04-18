@@ -14,3 +14,4 @@
 hw2/scala/out*
 hw2/scala/target
 hw2/scala/project
+hw2/pyspark/output*/
